@@ -1,45 +1,48 @@
 //Need to npm install apollo-server
 
-/*
-const { ApolloServer }= require(' insert location-of-apollo-server file '); 
-const { MONGODB } = require('./config.js') //We connected to MongoDB with the config file
-const mongoose = require('mongoose'); mongoose is a JavaScript library that connects MongoDB to Node.js
+const { ApolloServer } = require('apollo-server');
+const mongoose = require('mongoose');
 const typeDefs = require('./graphql/TypeDefs');
 const resolvers = require('./graphql/resolvers');
-*/
+const { MONGODB, PORT } = require('./config');
 
-
-
-/* Below is a ApolloServer constructor:
-
-from documentation: 
-- Returns an initialized ApolloServer instance.
-- Takes an options object as a parameter.
-*/
-
-
-/*
-EXAMPLE 
-
+// Create Apollo Server instance
 const server = new ApolloServer({
-    typeDefs,
-    resolvers,
-    context: ({req}) => ({ req })
+  typeDefs,
+  resolvers,
+  context: ({ req }) => ({ req }),
+  formatError: (err) => {
+    // Don't expose internal server errors to clients
+    if (err.message.startsWith('Database Error: ')) {
+      return new Error('Internal server error');
+    }
+    // Return the original error for all others
+    return err;
+  },
+  plugins: [
+    {
+      requestDidStart: () => ({
+        willSendResponse(requestContext) {
+          // Log any errors that occur
+          const errors = requestContext.response.errors;
+          if (errors) {
+            console.error('GraphQL Errors:', errors);
+          }
+        }
+      })
+    }
+  ]
 });
 
-*/
-
-
-/*
-
-mongoose
-  .connect(MONGODB, { useNewUrlParser: true })
+// Connect to MongoDB and start server
+mongoose.connect(MONGODB)
   .then(() => {
-    console.log('MongoDB Connected');
-    return server.listen({ port: 5000 });
+    console.log('📦 Connected to MongoDB');
+    return server.listen({ port: PORT });
   })
   .then((res) => {
-    console.log(`Server running at ${res.url}`);
+    console.log(`🚀 Server running at ${res.url}`);
+  })
+  .catch((err) => {
+    console.error('❌ Error:', err);
   });
-
-*/

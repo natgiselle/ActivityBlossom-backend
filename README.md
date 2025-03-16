@@ -1,102 +1,50 @@
-# SHPE UF SWE Team Training Backend Template
+## 🎯 Project Name & Summary:
+Project Name: ActivityBlossom
+Summary: ActivityBlossom is an intuitive task and habit tracker that helps users organize their lives while cultivating sustainable habits, all within a visually appealing flower-themed interface. By seamlessly integrating eco-friendly action tracking with daily planning, ActivityBlossom empowers users to prioritize productivity and make conscious choices towards a greener lifestyle, symbolized by the growth and beauty of flowers.
 
-![alt text](https://shpeuf.s3.amazonaws.com/public/misc/logo_horizontal.png "SHPE logo")
+## 👥 Target User:
+Target User: Individuals seeking to improve their organization, prioritize tasks, and incorporate sustainable practices into their daily routines. This includes students, professionals, and anyone who appreciates a visually engaging and motivating approach to productivity and mindful living.
+Specific Needs:
+Effective task and event management.
+A visually appealing and motivating interface.
+A way to track and encourage sustainable actions.
+Simple goal setting for both productivity and sustainability.
+Positive reinforcement for completing tasks and making eco-conscious choices.
 
-Congrats one more time on being selected as prospective software developer directors! (Sweenies) In this repository, you will find a template that you would want to use to build the backend functionality of your training project. 
+## 💡 Purpose & Problem Statement:
+Problem: Many individuals struggle to balance their daily tasks with a desire to live more sustainably. Existing organization tools often lack features that promote eco-friendly habits and can feel sterile or uninspiring.
+Purpose: ActivityBlossom aims to bridge this gap by providing a platform that integrates task management with sustainability awareness, all within a visually engaging, flower-themed environment.
+Superhero Superpower: ActivityBlossom's superpower is its ability to transform everyday tasks into opportunities for positive environmental impact, fostering a sense of mindful productivity and blooming a more sustainable lifestyle.
 
-## Why This Template?
+## 🔥 Core Features:
+Task & Event Management (Flower Themed): Users can create, schedule, and prioritize tasks and events. Icons and visual elements can be flower-related (e.g., a bud for a new task, a blooming flower for a completed one).
+"Eco-Friendly Action" Tracking: Users can check a box to indicate if a task was completed in a sustainable way. This action can trigger visual feedback like a flower blooming or petals being added to a flower icon.
+Simple Sustainability Goal Setting: Users can set basic sustainability goals (e.g., "Use reusable water bottle daily"). Progress towards these goals can be visually represented through the flower theme.
+Visual Progress Dashboard (Flower Inspired): A dashboard provides an overview of completed tasks and sustainability actions. This could be represented as a "garden" growing or individual flowers blooming.
+User Profile and Customization: Users can personalize their experience with different flower themes, colors, and potentially even choose their "avatar flower."
 
-This template should function as a building foundation for the backend of your project. In it, you will find how your web app should be structured, although it is not completely necessary, I truly recommend following this structure as it very closely mimics the way our own server is structured (plus it makes your JPM work easier) and will yield you better results once you are integraded into the team.
+## 🛠️ Technical Overview:
+Frontend (React):
+Handles the user interface, incorporating flower-themed visuals and animations.
+Uses GraphQL queries and mutations to fetch and update data.
+Backend (Node.js/Express/GraphQL):
+Exposes a GraphQL API for managing tasks, events, and sustainability actions.
+Manages user data and application logic.
+Database (MongoDB):
+Stores user data, tasks, events, and records of "Eco-Friendly Action" checks.
+Communication:
+The React frontend communicates with the Node.js/Express/GraphQL backend via HTTP requests.
+GraphQL is used for efficient data fetching and manipulation.
 
-Every file has it's own section in the readME(See navigation below) explaining its purpose and role in the proper function of your website. Each file in the repository also includes several commented out examples and explanations that you can follow to adjust it to your preferences and choice of theme/topic/info used.
+# Project Retrospective (After Training):
+## 🚀 Development Process & Challenges:
+How did you approach building the project, incorporating the flower theme and sustainability features? (Brainstorming, planning, coding, testing, etc.)
+What were the trickiest parts, especially in implementing the visual elements and sustainability tracking? How did you overcome them?
 
-## Getting Started
+## 🔮 Future Improvements:
+What additional flower-themed features or sustainability integrations could be implemented? (e.g., more complex goal tracking, integration with environmental APIs).
+If you had unlimited time and resources, how would you make ActivityBlossom even more visually stunning and impactful in promoting sustainable living?
 
-Before starting out, we must first take care of a couple of things. 
-
-If you haven't already, make sure you install the latest version of node.js, link: https://nodejs.org/en
-
-
-create our database! For this project, we will be using mongodb to store information from and to our server, as it is what we currently use to store all of SHPE UF's info from our website!
-
-I have created a short tutorial video to show how to set up mongoDB for this project: 
-
-Another important step if you have not done so already, open a terminal command and run "npm install" in the foulder where the package.json and package-lock.json are located. This will install all the dependencies you may need (note: if you decide to implement something extra, you will have to npm install said dependencies) But for now this should be enough to get the backend runnning! 
-
-## Navigation
-
-### index.js ###
-
-The index.js file is the entry point of your backend application. It brings together all the key components of your GraphQL server, connects to your MongoDB database, and starts the server.
-
-**Purpose:**
-
-* Set Up the Apollo Server: This file configures and initializes the Apollo Server, which handles GraphQL queries, mutations, and subscriptions.
-
-* Connect to MongoDB: It establishes a connection to the MongoDB database using Mongoose.
-
-* Start the Server: Once the database is successfully connected, the server starts and listens for incoming requests on the specified port.
-
-**ApolloServer documentation:** https://www.apollographql.com/docs/apollo-server/api/apollo-server
-
-**Mongoose docs:** https://mongoosejs.com/docs/connections.html
-
-### config.js ###
-This file is used to connect to the mongodb. not much to see here. watch video!
-
-### models folder
-
-#### TypeName.js
-
-The files in the model folder look extremely similar to the definitions already established on TypeDefs.js, so this part is pretty straightforward.
-
-This defines the database schema using Mongoose (for MongoDB).
-It specifies how data is stored and managed in MongoDB.
-
-Example: 
-
-```
-const { model, Schema } = require('mongoose');
-
-const artistSchema = new Schema({
-    name: String,
-    genre: String
-});
-
-module.exports = model('Artist', artistSchema);
-```
-
-### graphql folder
-
-#### -TypeDefs.js
-
-The TypeDefs.js file defines the GraphQL schema for your backend. This file is where you specify the structure of the data that can be queried or mutated through your API.
-
-The most basic components of a GraphQL schema are Object types,  which just represent a kind of object you can fetch from your service, and what fields it has. In SDL, we represent it like this:
-
-```
-type User {
-  id: ID!
-  name: String
-}
-
-type Query {
-  user(id: ID!): User
-}
-```
-
-### resolvers 
-
-If you want a more comprehensive tutorial or you like learning by doing before starting, check out this tutorial! https://www.apollographql.com/tutorials/lift-off-part2?referrer=docs-content
-
-In this template only one resolver (and type) is used. If you are using more than one type, for example, posts, users & comments, you will have to add the correspondent files manually.
-
-#### -index.js
-
-This index.js file inside the resolvers serves to export each individual resolver file.
-
-#### -typename.js
-
-"typename" is a placeholder for the name of your type. It is good practice to name this file the same as what is on your TypeDefs & Schema. 
-
-This is one of the most important files as here is where you will be adding functionality/definitions to your queries and mutations.
+## 📌 Conclusion & Reflections:
+What did you learn from incorporating a theme into your project and integrating a real-world concept like sustainability?
+If you could give advice to future "sweenies" taking on this training, especially those considering a themed project, what would it be?
