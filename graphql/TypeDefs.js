@@ -45,6 +45,15 @@ const TypeDefs = gql`
         avatarFlower: String
     }
 
+    type AuthPayload {
+        id: ID!
+        username: String!
+        email: String!
+        token: String!
+        createdAt: String!
+        avatarFlower: String
+    }
+
     type Task {
         id: ID!
         title: String!
@@ -121,23 +130,27 @@ const TypeDefs = gql`
         getSustainabilityGoals(userId: ID!): [SustainabilityGoal]
         getSustainabilityGoal(goalId: ID!): SustainabilityGoal
         getEcoActions(userId: ID!): [EcoAction]
+        getEcoAction(actionId: ID!): EcoAction
     }
 
     type Mutation {
-        register(registerInput: RegisterInput): User
-        login(username: String!, password: String!): User
-        createTask(taskInput: TaskInput): Task
-        updateTask(taskId: ID!, taskInput: TaskInput): Task
-        deleteTask(taskId: ID!): String
+        register(registerInput: RegisterInput!): AuthPayload!
+        login(username: String!, password: String!): AuthPayload!
+        createTask(taskInput: TaskInput!): Task!
+        updateTask(taskId: ID!, taskInput: TaskInput!): Task!
+        deleteTask(taskId: ID!): Boolean!
         toggleTaskCompletion(taskId: ID!): Task
         createEvent(eventInput: EventInput): Event
         updateEvent(eventId: ID!, eventInput: EventInput): Event
-        deleteEvent(eventId: ID!): String
+        deleteEvent(eventId: ID!): Boolean!
         createSustainabilityGoal(goalInput: SustainabilityGoalInput): SustainabilityGoal
         updateSustainabilityGoal(goalId: ID!, goalInput: SustainabilityGoalInput): SustainabilityGoal
-        deleteSustainabilityGoal(goalId: ID!): String
+        deleteSustainabilityGoal(goalId: ID!): Boolean!
         toggleGoalCompletion(goalId: ID!): SustainabilityGoal
         recordEcoAction(taskId: ID!, description: String!, impact: String): EcoAction
+        createEcoAction(taskId: ID!, description: String!, impact: String): EcoAction
+        updateEcoAction(actionId: ID!, description: String, impact: String): EcoAction
+        deleteEcoAction(actionId: ID!): Boolean!
     }
 `;
 

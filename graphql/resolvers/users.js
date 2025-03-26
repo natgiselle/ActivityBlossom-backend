@@ -55,9 +55,12 @@ module.exports = {
             const token = generateToken(user);
 
             return {
-                ...user._doc,
                 id: user._id,
-                token
+                username: user.username,
+                email: user.email,
+                token,
+                createdAt: user.createdAt,
+                avatarFlower: user.avatarFlower
             };
         },
         async register(_, { registerInput: { username, email, password, confirmPassword } }) {
@@ -98,9 +101,12 @@ module.exports = {
             const token = generateToken(res);
 
             return {
-                ...res._doc,
                 id: res._id,
-                token
+                username: res.username,
+                email: res.email,
+                token,
+                createdAt: res.createdAt,
+                avatarFlower: res.avatarFlower
             };
         }
     }

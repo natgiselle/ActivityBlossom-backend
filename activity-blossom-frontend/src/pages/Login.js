@@ -25,22 +25,46 @@ function Login() {
 
     const [loginUser, { loading }] = useMutation(LOGIN_USER, {
         update(_, { data: { login: userData } }) {
-            localStorage.setItem('token', userData.token);
-            navigate('/');
+            if (userData && userData.token) {
+                localStorage.setItem('token', userData.token);
+                navigate('/avatar-selection');
+            } else {
+                setErrors({ general: 'Login failed. Please try again.' });
+            }
         },
         onError(err) {
-            setErrors(err.graphQLErrors[0]?.extensions?.errors || {});
+            if (err.graphQLErrors && err.graphQLErrors[0]) {
+                setErrors(err.graphQLErrors[0].extensions?.errors || {});
+            } else {
+                setErrors({ general: 'An error occurred. Please try again.' });
+            }
         },
         variables: values
     });
 
     const handleSubmit = (event) => {
         event.preventDefault();
+        setErrors({});
+
+        // Basic validation
+        if (!values.username.trim()) {
+            setErrors({ username: 'Username is required' });
+            return;
+        }
+        if (!values.password) {
+            setErrors({ password: 'Password is required' });
+            return;
+        }
+
         loginUser();
     };
 
     const handleChange = (event) => {
         setValues({ ...values, [event.target.name]: event.target.value });
+        // Clear error when user starts typing
+        if (errors[event.target.name]) {
+            setErrors({ ...errors, [event.target.name]: undefined });
+        }
     };
 
     return (
@@ -79,8 +103,8 @@ function Login() {
                     {Object.keys(errors).length > 0 && (
                         <Message error>
                             <ul className="list">
-                                {Object.values(errors).map((value) => (
-                                    <li key={value}>{value}</li>
+                                {Object.values(errors).map((value, index) => (
+                                    <li key={index}>{value}</li>
                                 ))}
                             </ul>
                         </Message>
