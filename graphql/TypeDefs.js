@@ -41,7 +41,6 @@ const TypeDefs = gql`
         username: String!
         email: String!
         password: String!
-        token: String
         createdAt: String!
         avatarFlower: String
     }
