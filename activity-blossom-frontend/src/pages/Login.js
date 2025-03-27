@@ -22,37 +22,48 @@ function Login() {
         password: '',
     });
     const [errors, setErrors] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [loginUser, { loading }] = useMutation(LOGIN_USER, {
         update(_, { data: { login: userData } }) {
             if (userData && userData.token) {
                 localStorage.setItem('token', userData.token);
-                navigate('/avatar-selection');
+                setValues({ username: '', password: '' });
+                navigate('/avatar-selection', { replace: true });
             } else {
                 setErrors({ general: 'Login failed. Please try again.' });
             }
+            setIsSubmitting(false);
         },
         onError(err) {
             if (err.graphQLErrors && err.graphQLErrors[0]) {
-                setErrors(err.graphQLErrors[0].extensions?.errors || {});
+                const error = err.graphQLErrors[0].extensions?.errors || {};
+                setErrors(error);
+            } else if (err.networkError) {
+                setErrors({ general: 'Network error. Please check your connection.' });
             } else {
                 setErrors({ general: 'An error occurred. Please try again.' });
             }
+            setIsSubmitting(false);
         },
         variables: values
     });
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        setErrors({});
+        if (isSubmitting) return;
 
-        // Basic validation
+        setErrors({});
+        setIsSubmitting(true);
+
         if (!values.username.trim()) {
             setErrors({ username: 'Username is required' });
+            setIsSubmitting(false);
             return;
         }
         if (!values.password) {
             setErrors({ password: 'Password is required' });
+            setIsSubmitting(false);
             return;
         }
 
@@ -61,7 +72,6 @@ function Login() {
 
     const handleChange = (event) => {
         setValues({ ...values, [event.target.name]: event.target.value });
-        // Clear error when user starts typing
         if (errors[event.target.name]) {
             setErrors({ ...errors, [event.target.name]: undefined });
         }
@@ -96,8 +106,14 @@ function Login() {
                             onChange={handleChange}
                             error={errors.password ? true : false}
                         />
-                        <Button color='teal' fluid size='large'>
-                            Login
+                        <Button
+                            color='teal'
+                            fluid
+                            size='large'
+                            type='submit'
+                            disabled={isSubmitting}
+                        >
+                            {isSubmitting ? 'Logging in...' : 'Login'}
                         </Button>
                     </Segment>
                     {Object.keys(errors).length > 0 && (

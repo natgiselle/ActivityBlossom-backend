@@ -1,12 +1,63 @@
-import React from 'react';
-import { Container, Grid, Header, Segment, Icon, Statistic } from 'semantic-ui-react';
+import React, { useEffect } from 'react';
+import { Container, Grid, Header, Segment, Icon, Statistic, Button } from 'semantic-ui-react';
+import { useNavigate } from 'react-router-dom';
 
 function Home() {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        console.log('Home component mounted');
+        // Check if we have both token and avatar color
+        const token = localStorage.getItem('token');
+        const avatarColor = localStorage.getItem('userAvatarColor');
+
+        if (!token) {
+            console.log('No token found, redirecting to login');
+            navigate('/login', { replace: true });
+            return;
+        }
+
+        if (!avatarColor) {
+            console.log('No avatar color found, redirecting to avatar selection');
+            navigate('/avatar-selection', { replace: true });
+            return;
+        }
+    }, [navigate]);
+
+    const handlePreviousPage = () => {
+        console.log('Navigating to avatar selection');
+        navigate('/avatar-selection', { replace: true });
+    };
+
+    const handleLogout = () => {
+        console.log('Logging out');
+        localStorage.removeItem('token');
+        localStorage.removeItem('userAvatarColor');
+        navigate('/login', { replace: true });
+    };
+
     return (
         <Container>
-            <Header as='h1' textAlign='center' color='teal' style={{ margin: '2em 0' }}>
-                🌸 Welcome to ActivityBlossom
-            </Header>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2em' }}>
+                <div style={{ display: 'flex', gap: '1em' }}>
+                    <Button
+                        color='grey'
+                        icon='arrow left'
+                        content='Previous Page'
+                        onClick={handlePreviousPage}
+                    />
+                    <Button
+                        color='red'
+                        icon='sign out'
+                        content='Logout'
+                        onClick={handleLogout}
+                    />
+                </div>
+                <Header as='h1' color='teal'>
+                    🌸 Welcome to ActivityBlossom
+                </Header>
+                <div style={{ width: '200px' }}></div> {/* Spacer for alignment */}
+            </div>
 
             <Grid stackable columns={3} textAlign='center'>
                 <Grid.Row>

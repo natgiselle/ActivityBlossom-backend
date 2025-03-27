@@ -16,35 +16,61 @@ const colors = [
 
 function AvatarSelection() {
     const navigate = useNavigate();
-    const [selectedColor, setSelectedColor] = useState('#4A90E2'); // Default to blue
+    const [selectedColor, setSelectedColor] = useState('#4A90E2');
 
     const handleColorSelect = (color) => {
         setSelectedColor(color);
     };
 
     const handleContinue = () => {
-        // Save the selected color to localStorage or your user profile
         localStorage.setItem('userAvatarColor', selectedColor);
         navigate('/home');
+    };
+
+    const handleBack = () => {
+        localStorage.removeItem('token');
+        navigate('/login', { replace: true });
     };
 
     return (
         <Grid textAlign='center' style={{ height: '100vh' }} verticalAlign='middle'>
             <Grid.Column style={{ maxWidth: 600 }}>
-                <Segment>
-                    <Header as='h2' color='teal' textAlign='center'>
-                        🐝 Choose Your Bee's Color
-                    </Header>
+                <Segment raised>
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '2em'
+                    }}>
+                        <Button
+                            color='grey'
+                            icon='arrow left'
+                            content='Previous Page'
+                            onClick={handleBack}
+                        />
+                        <Header as='h2' color='teal'>
+                            🐝 Choose Your Bee's Color
+                        </Header>
+                        <div style={{ width: '120px' }}></div>
+                    </div>
 
-                    <div style={{ margin: '2em 0' }}>
+                    <div style={{
+                        margin: '2em 0',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}>
                         <Image
-                            src="/bee-avatar.png" // You'll need to add this image to your public folder
+                            src="/bee-avatar.png"
                             size="medium"
                             style={{
                                 backgroundColor: selectedColor,
                                 padding: '1em',
                                 borderRadius: '50%',
-                                margin: '0 auto'
+                                margin: '0 auto',
+                                width: '150px',
+                                height: '150px',
+                                objectFit: 'contain'
                             }}
                         />
                     </div>
@@ -57,7 +83,8 @@ function AvatarSelection() {
                                     style={{
                                         backgroundColor: color.value,
                                         color: color.value === '#FFFFFF' ? '#000000' : '#FFFFFF',
-                                        border: selectedColor === color.value ? '3px solid #21BA45' : 'none'
+                                        border: selectedColor === color.value ? '3px solid #21BA45' : 'none',
+                                        marginBottom: '10px'
                                     }}
                                     onClick={() => handleColorSelect(color.value)}
                                 >
@@ -67,14 +94,20 @@ function AvatarSelection() {
                         ))}
                     </Grid>
 
-                    <Button
-                        color='teal'
-                        size='large'
-                        style={{ marginTop: '2em' }}
-                        onClick={handleContinue}
-                    >
-                        Continue to Dashboard
-                    </Button>
+                    <div style={{
+                        marginTop: '2em',
+                        display: 'flex',
+                        justifyContent: 'center'
+                    }}>
+                        <Button
+                            color='teal'
+                            size='large'
+                            onClick={handleContinue}
+                            style={{ width: '200px' }}
+                        >
+                            Continue to Dashboard
+                        </Button>
+                    </div>
                 </Segment>
             </Grid.Column>
         </Grid>

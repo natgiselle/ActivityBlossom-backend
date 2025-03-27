@@ -1,89 +1,137 @@
-import React from 'react';
-import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from '@apollo/client';
-import { setContext } from '@apollo/client/link/context';
-import { BrowserRouter as Router, Routes, Route, Navigate, Link, useNavigate } from 'react-router-dom';
-import { Container, Menu, Button } from 'semantic-ui-react';
-import 'semantic-ui-css/semantic.min.css';
-import './App.css';
-
+import React, { ReactNode } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { ApolloProvider } from '@apollo/client';
+import { Container } from 'semantic-ui-react';
+import client from './apolloClient';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
-import Tasks from './pages/Tasks';
-import Settings from './pages/Settings';
 import AvatarSelection from './pages/AvatarSelection';
+import Tasks from './pages/Tasks';
+import Events from './pages/Events';
+import Goals from './pages/Goals';
+import Profile from './pages/Profile';
 
-// Create HTTP link
-const httpLink = createHttpLink({
-  uri: 'http://localhost:4000'
-});
-
-// Add authentication to requests
-const authLink = setContext((_, { headers }) => {
-  const token = localStorage.getItem('token');
-  return {
-    headers: {
-      ...headers,
-      authorization: token ? `Bearer ${token}` : ''
-    }
-  };
-});
-
-// Create Apollo Client
-const client = new ApolloClient({
-  link: authLink.concat(httpLink),
-  cache: new InMemoryCache()
-});
-
-const Navigation = () => {
-  const navigate = useNavigate();
-  const token = localStorage.getItem('token');
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
-  };
-
-  if (!token) return null;
-
-  return (
-    <Menu fixed="top" inverted>
-      <Container>
-        <Menu.Item header as={Link} to="/" content="Activity Blossom" />
-        <Menu.Item as={Link} to="/tasks" content="Tasks" />
-        <Menu.Item as={Link} to="/settings" content="Settings" />
-        <Menu.Menu position="right">
-          <Menu.Item>
-            <Button inverted onClick={handleLogout}>
-              Logout
-            </Button>
-          </Menu.Item>
-        </Menu.Menu>
-      </Container>
-    </Menu>
-  );
-};
+// ScrollToTop component to handle route changes
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
 
 function App() {
-  const token = localStorage.getItem('token');
-
   return (
     <ApolloProvider client={client}>
       <Router>
-        <Navigation />
-        <Container style={{ marginTop: '4em' }}>
+        <ScrollToTop />
+        <Container fluid>
           <Routes>
-            <Route path="/" element={token ? <Home /> : <Navigate to="/login" />} />
-            <Route path="/login" element={!token ? <Login /> : <Navigate to="/avatar-selection" />} />
-            <Route path="/register" element={!token ? <Register /> : <Navigate to="/avatar-selection" />} />
-            <Route path="/avatar-selection" element={token ? <AvatarSelection /> : <Navigate to="/login" />} />
-            <Route path="/tasks" element={token ? <Tasks /> : <Navigate to="/login" />} />
-            <Route path="/settings" element={token ? <Settings /> : <Navigate to="/login" />} />
+            {/* Public routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+
+            {/* Avatar Selection route - only requires token */}
+            <Route
+              path="/avatar-selection"
+              element={
+                <TokenProtectedRoute>
+                  <AvatarSelection />
+                </TokenProtectedRoute>
+              }
+            />
+
+            {/* Protected routes - require both token and avatar */}
+            <Route
+              path="/home"
+              element={
+                <ProtectedRoute>
+                  <Home />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/tasks"
+              element={
+                <ProtectedRoute>
+                  <Tasks />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/events"
+              element={
+                <ProtectedRoute>
+                  <Events />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/goals"
+              element={
+                <ProtectedRoute>
+                  <Goals />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Default route */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
           </Routes>
         </Container>
       </Router>
     </ApolloProvider>
   );
+}
+
+// Protected Route component - requires both token and avatar
+interface ProtectedRouteProps {
+  children: ReactNode;
+}
+
+function ProtectedRoute({ children }: ProtectedRouteProps) {
+  const token = localStorage.getItem('token');
+  const avatarColor = localStorage.getItem('userAvatarColor');
+
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!avatarColor) {
+    return <Navigate to="/avatar-selection" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+// Token Protected Route component - only requires token
+interface TokenProtectedRouteProps {
+  children: ReactNode;
+}
+
+function TokenProtectedRoute({ children }: TokenProtectedRouteProps) {
+  const token = localStorage.getItem('token');
+  const avatarColor = localStorage.getItem('userAvatarColor');
+
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // If we already have an avatar color, redirect to home
+  if (avatarColor) {
+    return <Navigate to="/home" replace />;
+  }
+
+  return <>{children}</>;
 }
 
 export default App;
