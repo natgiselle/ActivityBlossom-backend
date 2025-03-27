@@ -1,9 +1,11 @@
-import React, { useEffect } from 'react';
-import { Container, Grid, Header, Segment, Icon, Statistic, Button } from 'semantic-ui-react';
+import React, { useState, useEffect } from 'react';
+import { Container, Grid, Header, Segment, Icon, Statistic, Button, Label } from 'semantic-ui-react';
 import { useNavigate } from 'react-router-dom';
 
 function Home() {
     const navigate = useNavigate();
+    const [tasks, setTasks] = useState([]);
+    const [completedCount, setCompletedCount] = useState(0);
 
     useEffect(() => {
         console.log('Home component mounted');
@@ -22,6 +24,16 @@ function Home() {
             navigate('/avatar-selection', { replace: true });
             return;
         }
+
+        // Load tasks from localStorage
+        const savedTasks = localStorage.getItem('userTasks');
+        if (savedTasks) {
+            const parsedTasks = JSON.parse(savedTasks);
+            setTasks(parsedTasks);
+            // Calculate completed tasks
+            const completed = parsedTasks.filter(task => task.completed).length;
+            setCompletedCount(completed);
+        }
     }, [navigate]);
 
     const handlePreviousPage = () => {
@@ -34,6 +46,10 @@ function Home() {
         localStorage.removeItem('token');
         localStorage.removeItem('userAvatarColor');
         navigate('/login', { replace: true });
+    };
+
+    const handleTaskManagement = () => {
+        navigate('/task-management');
     };
 
     return (
@@ -103,7 +119,19 @@ function Home() {
                             <Icon name='tasks' color='teal' />
                             <Header.Content>Recent Tasks</Header.Content>
                         </Header>
-                        <p>No tasks yet. Start by adding your first task!</p>
+                        <div style={{ marginBottom: '2em' }}>
+                            <Button
+                                color='teal'
+                                size='large'
+                                onClick={handleTaskManagement}
+                                style={{ marginBottom: '1em' }}
+                            >
+                                Recent Tasks
+                                <Label color='teal' size='large' style={{ marginLeft: '1em' }}>
+                                    {completedCount}/{tasks.length}
+                                </Label>
+                            </Button>
+                        </div>
                     </Segment>
                 </Grid.Column>
 

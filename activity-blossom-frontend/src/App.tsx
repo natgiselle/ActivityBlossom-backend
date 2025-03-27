@@ -11,6 +11,7 @@ import Tasks from './pages/Tasks';
 import Events from './pages/Events';
 import Goals from './pages/Goals';
 import Profile from './pages/Profile';
+import TaskManagement from './pages/TaskManagement';
 
 // ScrollToTop component to handle route changes
 function ScrollToTop() {
@@ -56,6 +57,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Tasks />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/task-management"
+              element={
+                <ProtectedRoute>
+                  <TaskManagement />
                 </ProtectedRoute>
               }
             />
