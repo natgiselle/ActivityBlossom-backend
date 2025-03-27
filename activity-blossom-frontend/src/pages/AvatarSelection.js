@@ -16,10 +16,13 @@ const colors = [
 
 function AvatarSelection() {
     const navigate = useNavigate();
-    const [selectedColor, setSelectedColor] = useState('#4A90E2');
+    const [selectedColor, setSelectedColor] = useState(colors[0].value);
 
     const handleColorSelect = (color) => {
         setSelectedColor(color);
+        localStorage.setItem('userAvatarColor', color);
+        // Dispatch custom event for same-window updates
+        window.dispatchEvent(new CustomEvent('avatarColorChange', { detail: color }));
     };
 
     const handleContinue = () => {
@@ -70,7 +73,8 @@ function AvatarSelection() {
                                 margin: '0 auto',
                                 width: '150px',
                                 height: '150px',
-                                objectFit: 'contain'
+                                objectFit: 'contain',
+                                transition: 'all 0.3s ease-in-out'
                             }}
                         />
                     </div>
