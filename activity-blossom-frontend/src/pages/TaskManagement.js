@@ -7,6 +7,7 @@ function TaskManagement() {
     const [tasks, setTasks] = useState([]);
     const [newTask, setNewTask] = useState('');
     const [completedCount, setCompletedCount] = useState(0);
+    const [ecoFriendlyCount, setEcoFriendlyCount] = useState(0);
 
     useEffect(() => {
         // Load tasks from localStorage
@@ -17,6 +18,9 @@ function TaskManagement() {
             // Calculate completed tasks
             const completed = parsedTasks.filter(task => task.completed).length;
             setCompletedCount(completed);
+            // Calculate eco-friendly tasks
+            const ecoFriendly = parsedTasks.filter(task => task.ecoFriendly).length;
+            setEcoFriendlyCount(ecoFriendly);
         }
     }, []);
 
@@ -28,6 +32,7 @@ function TaskManagement() {
             id: Date.now(),
             text: newTask.trim(),
             completed: false,
+            ecoFriendly: false,
             createdAt: new Date().toISOString()
         };
 
@@ -51,12 +56,29 @@ function TaskManagement() {
         localStorage.setItem('userTasks', JSON.stringify(updatedTasks));
     };
 
+    const handleToggleEcoFriendly = (taskId) => {
+        const updatedTasks = tasks.map(task => {
+            if (task.id === taskId) {
+                const newEcoFriendly = !task.ecoFriendly;
+                setEcoFriendlyCount(prev => newEcoFriendly ? prev + 1 : prev - 1);
+                return { ...task, ecoFriendly: newEcoFriendly };
+            }
+            return task;
+        });
+
+        setTasks(updatedTasks);
+        localStorage.setItem('userTasks', JSON.stringify(updatedTasks));
+    };
+
     const handleDeleteTask = (taskId) => {
         const taskToDelete = tasks.find(task => task.id === taskId);
         const updatedTasks = tasks.filter(task => task.id !== taskId);
 
         if (taskToDelete.completed) {
             setCompletedCount(prev => prev - 1);
+        }
+        if (taskToDelete.ecoFriendly) {
+            setEcoFriendlyCount(prev => prev - 1);
         }
 
         setTasks(updatedTasks);
@@ -85,9 +107,14 @@ function TaskManagement() {
                         />
                         <Header as='h2' color='teal'>
                             Task Management
-                            <Label color='teal' size='large' style={{ marginLeft: '1em' }}>
-                                {completedCount}/{tasks.length}
-                            </Label>
+                            <div style={{ display: 'flex', gap: '1em', marginTop: '0.5em' }}>
+                                <Label color='teal' size='large'>
+                                    Completed: {completedCount}/{tasks.length}
+                                </Label>
+                                <Label color='green' size='large'>
+                                    <Icon name='leaf' /> Eco-friendly: {ecoFriendlyCount}
+                                </Label>
+                            </div>
                         </Header>
                         <div style={{ width: '120px' }}></div>
                     </div>
@@ -113,13 +140,20 @@ function TaskManagement() {
                                             alignItems: 'center',
                                             justifyContent: 'space-between'
                                         }}>
-                                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '1em' }}>
                                                 <Icon
                                                     name={task.completed ? 'check circle' : 'circle outline'}
                                                     color={task.completed ? 'green' : 'grey'}
                                                     size='large'
-                                                    style={{ cursor: 'pointer', marginRight: '1em' }}
+                                                    style={{ cursor: 'pointer' }}
                                                     onClick={() => handleToggleTask(task.id)}
+                                                />
+                                                <Icon
+                                                    name='leaf'
+                                                    color={task.ecoFriendly ? 'green' : 'grey'}
+                                                    size='large'
+                                                    style={{ cursor: 'pointer' }}
+                                                    onClick={() => handleToggleEcoFriendly(task.id)}
                                                 />
                                                 <span style={{
                                                     textDecoration: task.completed ? 'line-through' : 'none',

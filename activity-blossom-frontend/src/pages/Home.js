@@ -6,6 +6,7 @@ function Home() {
     const navigate = useNavigate();
     const [tasks, setTasks] = useState([]);
     const [completedCount, setCompletedCount] = useState(0);
+    const [ecoFriendlyCount, setEcoFriendlyCount] = useState(0);
 
     useEffect(() => {
         console.log('Home component mounted');
@@ -33,6 +34,9 @@ function Home() {
             // Calculate completed tasks
             const completed = parsedTasks.filter(task => task.completed).length;
             setCompletedCount(completed);
+            // Calculate eco-friendly tasks
+            const ecoFriendly = parsedTasks.filter(task => task.ecoFriendly).length;
+            setEcoFriendlyCount(ecoFriendly);
         }
     }, [navigate]);
 
@@ -81,7 +85,7 @@ function Home() {
                         <Segment padded circular style={{ backgroundColor: '#E8F5E9' }}>
                             <Statistic>
                                 <Statistic.Value>
-                                    <Icon name='leaf' color='green' /> 0
+                                    <Icon name='leaf' color='green' /> {ecoFriendlyCount}
                                 </Statistic.Value>
                                 <Statistic.Label>Eco-friendly Tasks</Statistic.Label>
                             </Statistic>

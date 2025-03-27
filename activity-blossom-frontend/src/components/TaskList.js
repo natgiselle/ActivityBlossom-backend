@@ -6,7 +6,6 @@ import {
     Grid,
     Icon,
     Modal,
-    Segment,
 } from 'semantic-ui-react';
 
 const TaskList = () => {

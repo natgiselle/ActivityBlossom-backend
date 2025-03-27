@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Grid, Tab, Menu } from 'semantic-ui-react';
+import { Container, Grid, Tab } from 'semantic-ui-react';
 import TaskList from '../components/TaskList';
 import SustainabilityIdeas from '../components/SustainabilityIdeas';
 
