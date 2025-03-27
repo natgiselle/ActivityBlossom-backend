@@ -9,6 +9,8 @@ function Home() {
     const [ecoFriendlyCount, setEcoFriendlyCount] = useState(0);
     const [eventCount, setEventCount] = useState(0);
     const [eventEcoFriendlyCount, setEventEcoFriendlyCount] = useState(0);
+    const [goals, setGoals] = useState([]);
+    const [goalEcoFriendlyCount, setGoalEcoFriendlyCount] = useState(0);
 
     useEffect(() => {
         console.log('Home component mounted');
@@ -50,6 +52,16 @@ function Home() {
             const ecoFriendly = parsedEvents.filter(event => event.ecoFriendly).length;
             setEventEcoFriendlyCount(ecoFriendly);
         }
+
+        // Load goals from localStorage
+        const savedGoals = localStorage.getItem('goals');
+        if (savedGoals) {
+            const parsedGoals = JSON.parse(savedGoals);
+            setGoals(parsedGoals);
+            // Calculate eco-friendly goals
+            const ecoFriendly = parsedGoals.filter(goal => goal.isEcoFriendly).length;
+            setGoalEcoFriendlyCount(ecoFriendly);
+        }
     }, [navigate]);
 
     const handlePreviousPage = () => {
@@ -70,6 +82,10 @@ function Home() {
 
     const handleEvents = () => {
         navigate('/events');
+    };
+
+    const handleGoals = () => {
+        navigate('/goals');
     };
 
     return (
@@ -123,7 +139,7 @@ function Home() {
                         <Segment padded circular style={{ backgroundColor: '#FFF3E0' }}>
                             <Statistic>
                                 <Statistic.Value>
-                                    <Icon name='star' color='yellow' /> 0
+                                    <Icon name='star' color='yellow' /> {goals.length}
                                 </Statistic.Value>
                                 <Statistic.Label>Goals Set</Statistic.Label>
                             </Statistic>
@@ -132,7 +148,7 @@ function Home() {
                 </Grid.Row>
             </Grid>
 
-            <Grid stackable columns={2} style={{ marginTop: '2em' }}>
+            <Grid stackable columns={3} style={{ marginTop: '2em' }}>
                 <Grid.Column>
                     <Segment>
                         <Header as='h3'>
@@ -172,6 +188,31 @@ function Home() {
                                 <Label color='blue' size='large' style={{ marginLeft: '1em' }}>
                                     {eventCount} Events
                                     {eventEcoFriendlyCount > 0 && (
+                                        <Icon name='leaf' color='green' style={{ marginLeft: '0.5em' }} />
+                                    )}
+                                </Label>
+                            </Button>
+                        </div>
+                    </Segment>
+                </Grid.Column>
+
+                <Grid.Column>
+                    <Segment>
+                        <Header as='h3'>
+                            <Icon name='star' color='teal' />
+                            <Header.Content>Goals Pictured</Header.Content>
+                        </Header>
+                        <div style={{ marginBottom: '2em' }}>
+                            <Button
+                                color='yellow'
+                                size='large'
+                                onClick={handleGoals}
+                                style={{ marginBottom: '1em' }}
+                            >
+                                Manage Goals
+                                <Label color='yellow' size='large' style={{ marginLeft: '1em' }}>
+                                    {goals.length} Goals
+                                    {goalEcoFriendlyCount > 0 && (
                                         <Icon name='leaf' color='green' style={{ marginLeft: '0.5em' }} />
                                     )}
                                 </Label>
