@@ -7,6 +7,8 @@ function Home() {
     const [tasks, setTasks] = useState([]);
     const [completedCount, setCompletedCount] = useState(0);
     const [ecoFriendlyCount, setEcoFriendlyCount] = useState(0);
+    const [eventCount, setEventCount] = useState(0);
+    const [eventEcoFriendlyCount, setEventEcoFriendlyCount] = useState(0);
 
     useEffect(() => {
         console.log('Home component mounted');
@@ -38,6 +40,16 @@ function Home() {
             const ecoFriendly = parsedTasks.filter(task => task.ecoFriendly).length;
             setEcoFriendlyCount(ecoFriendly);
         }
+
+        // Load events from localStorage
+        const savedEvents = localStorage.getItem('userEvents');
+        if (savedEvents) {
+            const parsedEvents = JSON.parse(savedEvents);
+            setEventCount(parsedEvents.length);
+            // Calculate eco-friendly events
+            const ecoFriendly = parsedEvents.filter(event => event.ecoFriendly).length;
+            setEventEcoFriendlyCount(ecoFriendly);
+        }
     }, [navigate]);
 
     const handlePreviousPage = () => {
@@ -54,6 +66,10 @@ function Home() {
 
     const handleTaskManagement = () => {
         navigate('/task-management');
+    };
+
+    const handleEvents = () => {
+        navigate('/events');
     };
 
     return (
@@ -96,7 +112,7 @@ function Home() {
                         <Segment padded circular style={{ backgroundColor: '#E3F2FD' }}>
                             <Statistic>
                                 <Statistic.Value>
-                                    <Icon name='calendar check' color='blue' /> 0
+                                    <Icon name='calendar check' color='blue' /> {eventCount}
                                 </Statistic.Value>
                                 <Statistic.Label>Events Planned</Statistic.Label>
                             </Statistic>
@@ -145,7 +161,22 @@ function Home() {
                             <Icon name='calendar alternate' color='teal' />
                             <Header.Content>Upcoming Events</Header.Content>
                         </Header>
-                        <p>No events scheduled. Plan your first event!</p>
+                        <div style={{ marginBottom: '2em' }}>
+                            <Button
+                                color='blue'
+                                size='large'
+                                onClick={handleEvents}
+                                style={{ marginBottom: '1em' }}
+                            >
+                                Manage Events
+                                <Label color='blue' size='large' style={{ marginLeft: '1em' }}>
+                                    {eventCount} Events
+                                    {eventEcoFriendlyCount > 0 && (
+                                        <Icon name='leaf' color='green' style={{ marginLeft: '0.5em' }} />
+                                    )}
+                                </Label>
+                            </Button>
+                        </div>
                     </Segment>
                 </Grid.Column>
             </Grid>
