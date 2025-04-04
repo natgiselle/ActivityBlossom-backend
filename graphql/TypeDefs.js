@@ -115,6 +115,7 @@ const TypeDefs = gql`
 
     type Query {
         getUser(userId: ID!): User
+        getUsers: [User]!
         getTasks(userId: ID!): [Task]
         getTask(taskId: ID!): Task
         getEvents(userId: ID!): [Event]
