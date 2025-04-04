@@ -1,16 +1,22 @@
 const User = require('../../models/User');
+const bcrypt = require('bcryptjs');
 const { UserInputError } = require('apollo-server');
 
 module.exports = {
     Query: {
         async getUser(_, { email, password }) {
             try {
-                const user = await User.findOne({ email, password });
-                if (user) {
-                    return user;
-                } else {
+                const user = await User.findOne({ email });
+                if (!user) {
                     throw new Error('User not found');
                 }
+
+                const match = await bcrypt.compare(password, user.password);
+                if (!match) {
+                    throw new Error('Invalid password');
+                }
+
+                return user;
             } catch (err) {
                 throw new Error(err);
             }
@@ -26,9 +32,14 @@ module.exports = {
     },
     Mutation: {
         async login(_, { email, password }) {
-            const user = await User.findOne({ email, password });
+            const user = await User.findOne({ email });
 
             if (!user) {
+                throw new UserInputError('Invalid credentials');
+            }
+
+            const match = await bcrypt.compare(password, user.password);
+            if (!match) {
                 throw new UserInputError('Invalid credentials');
             }
 
@@ -41,9 +52,11 @@ module.exports = {
                 throw new UserInputError('Email is already registered');
             }
 
+            const hashedPassword = await bcrypt.hash(password, 12);
+
             const newUser = new User({
                 email,
-                password,
+                password: hashedPassword,
                 createdAt: new Date().toISOString(),
                 avatarFlower: 'default'
             });
