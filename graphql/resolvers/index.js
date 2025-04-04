@@ -1,33 +1,22 @@
-/*
-
-# 
-the code below will be changed to whichever name your type is, but the structure will stay the same!
-Ex:
-
-const artistsResolvers = require('./artists');
-
-module.exports = artistsResolvers;
-
-if you have multiple types, it might look a little more like the following:
-
-const postsResolvers = require('./posts');
 const usersResolvers = require('./users');
-const commentsResolvers = require('./comments')
+const tasksResolvers = require('./tasks');
+const eventsResolvers = require('./events');
+const sustainabilityGoalsResolvers = require('./sustainabilityGoals');
+const ecoActionsResolvers = require('./ecoActions');
 
 module.exports = {
-    Post: {
-        likeCount: (parent) => parent.likes.length,
-        commentCount: (parent) => parent.comments.length
-    },
     Query: {
-
-        ...postsResolvers.Query
+        ...usersResolvers.Query,
+        ...tasksResolvers.Query,
+        ...eventsResolvers.Query,
+        ...sustainabilityGoalsResolvers.Query,
+        ...ecoActionsResolvers.Query
     },
     Mutation: {
         ...usersResolvers.Mutation,
-        ...postsResolvers.Mutation,
-        ...commentsResolvers.Mutation
+        ...tasksResolvers.Mutation,
+        ...eventsResolvers.Mutation,
+        ...sustainabilityGoalsResolvers.Mutation,
+        ...ecoActionsResolvers.Mutation
     }
-
 };
-*/
