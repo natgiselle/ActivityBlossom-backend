@@ -47,4 +47,4 @@ If you had unlimited time and resources, how would you make ActivityBlossom even
 
 ## 📌 Conclusion & Reflections:
 What did you learn from incorporating a theme into your project and integrating a real-world concept like sustainability?
-If you could give advice to future "sweenies" taking on this training, especially those considering a themed project, what would it be?
+If you could give advice to future "sweenies" taking on this training, especially those considering a themed project, what would it be?# 
