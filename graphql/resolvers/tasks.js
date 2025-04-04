@@ -1,24 +1,30 @@
 const Task = require('../../models/Task');
-const checkAuth = require('../../util/check-auth');
+const User = require('../../models/User');
 const { AuthenticationError, UserInputError } = require('apollo-server');
 
 module.exports = {
     Query: {
-        async getTasks(_, { userId }, context) {
+        async getTasks(_, { userId }) {
             try {
-                const user = checkAuth(context);
+                const user = await User.findById(userId);
+                if (!user) {
+                    throw new Error('User not found');
+                }
                 const tasks = await Task.find({ userId }).sort({ createdAt: -1 });
                 return tasks;
             } catch (err) {
                 throw new Error(err);
             }
         },
-        async getTask(_, { taskId }, context) {
+        async getTask(_, { taskId, userId }) {
             try {
-                const user = checkAuth(context);
+                const user = await User.findById(userId);
+                if (!user) {
+                    throw new Error('User not found');
+                }
                 const task = await Task.findById(taskId);
                 if (task) {
-                    if (task.userId.toString() === user.id) {
+                    if (task.userId.toString() === userId) {
                         return task;
                     } else {
                         throw new AuthenticationError('Action not allowed');
@@ -32,8 +38,12 @@ module.exports = {
         }
     },
     Mutation: {
-        async createTask(_, { taskInput: { title, description, dueDate, isEcoFriendly } }, context) {
-            const user = checkAuth(context);
+        async createTask(_, { taskInput: { title, description, dueDate, isEcoFriendly }, userId }) {
+            // First verify the user exists
+            const user = await User.findById(userId);
+            if (!user) {
+                throw new Error('User not found');
+            }
 
             if (title.trim() === '') {
                 throw new UserInputError('Empty title', {
@@ -49,20 +59,23 @@ module.exports = {
                 dueDate,
                 completed: false,
                 isEcoFriendly,
-                userId: user.id,
+                userId,
                 createdAt: new Date().toISOString()
             });
 
             const task = await newTask.save();
             return task;
         },
-        async updateTask(_, { taskId, taskInput: { title, description, dueDate, isEcoFriendly } }, context) {
-            const user = checkAuth(context);
+        async updateTask(_, { taskId, taskInput: { title, description, dueDate, isEcoFriendly }, userId }) {
+            const user = await User.findById(userId);
+            if (!user) {
+                throw new Error('User not found');
+            }
 
             try {
                 const task = await Task.findById(taskId);
                 if (task) {
-                    if (task.userId.toString() === user.id) {
+                    if (task.userId.toString() === userId) {
                         if (title.trim() === '') {
                             throw new UserInputError('Empty title', {
                                 errors: {
@@ -88,14 +101,17 @@ module.exports = {
                 throw new Error(err);
             }
         },
-        async deleteTask(_, { taskId }, context) {
-            const user = checkAuth(context);
+        async deleteTask(_, { taskId, userId }) {
+            const user = await User.findById(userId);
+            if (!user) {
+                throw new Error('User not found');
+            }
 
             try {
                 const task = await Task.findById(taskId);
                 if (task) {
-                    if (task.userId.toString() === user.id) {
-                        await task.delete();
+                    if (task.userId.toString() === userId) {
+                        await Task.deleteOne({ _id: taskId });
                         return 'Task deleted successfully';
                     } else {
                         throw new AuthenticationError('Action not allowed');
@@ -107,13 +123,16 @@ module.exports = {
                 throw new Error(err);
             }
         },
-        async toggleTaskCompletion(_, { taskId }, context) {
-            const user = checkAuth(context);
+        async toggleTaskCompletion(_, { taskId, userId }) {
+            const user = await User.findById(userId);
+            if (!user) {
+                throw new Error('User not found');
+            }
 
             try {
                 const task = await Task.findById(taskId);
                 if (task) {
-                    if (task.userId.toString() === user.id) {
+                    if (task.userId.toString() === userId) {
                         task.completed = !task.completed;
                         await task.save();
                         return task;

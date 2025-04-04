@@ -1,24 +1,30 @@
 const Event = require('../../models/Event');
-const checkAuth = require('../../util/check-auth');
+const User = require('../../models/User');
 const { AuthenticationError, UserInputError } = require('apollo-server');
 
 module.exports = {
     Query: {
-        async getEvents(_, { userId }, context) {
+        async getEvents(_, { userId }) {
             try {
-                const user = checkAuth(context);
+                const user = await User.findById(userId);
+                if (!user) {
+                    throw new Error('User not found');
+                }
                 const events = await Event.find({ userId }).sort({ startDate: 1 });
                 return events;
             } catch (err) {
                 throw new Error(err);
             }
         },
-        async getEvent(_, { eventId }, context) {
+        async getEvent(_, { eventId, userId }) {
             try {
-                const user = checkAuth(context);
+                const user = await User.findById(userId);
+                if (!user) {
+                    throw new Error('User not found');
+                }
                 const event = await Event.findById(eventId);
                 if (event) {
-                    if (event.userId.toString() === user.id) {
+                    if (event.userId.toString() === userId) {
                         return event;
                     } else {
                         throw new AuthenticationError('Action not allowed');
@@ -32,8 +38,11 @@ module.exports = {
         }
     },
     Mutation: {
-        async createEvent(_, { eventInput: { title, description, startDate, endDate } }, context) {
-            const user = checkAuth(context);
+        async createEvent(_, { eventInput: { title, description, startDate, endDate }, userId }) {
+            const user = await User.findById(userId);
+            if (!user) {
+                throw new Error('User not found');
+            }
 
             if (title.trim() === '') {
                 throw new UserInputError('Empty title', {
@@ -48,20 +57,23 @@ module.exports = {
                 description,
                 startDate,
                 endDate,
-                userId: user.id,
+                userId,
                 createdAt: new Date().toISOString()
             });
 
             const event = await newEvent.save();
             return event;
         },
-        async updateEvent(_, { eventId, eventInput: { title, description, startDate, endDate } }, context) {
-            const user = checkAuth(context);
+        async updateEvent(_, { eventId, eventInput: { title, description, startDate, endDate }, userId }) {
+            const user = await User.findById(userId);
+            if (!user) {
+                throw new Error('User not found');
+            }
 
             try {
                 const event = await Event.findById(eventId);
                 if (event) {
-                    if (event.userId.toString() === user.id) {
+                    if (event.userId.toString() === userId) {
                         if (title.trim() === '') {
                             throw new UserInputError('Empty title', {
                                 errors: {
@@ -87,13 +99,16 @@ module.exports = {
                 throw new Error(err);
             }
         },
-        async deleteEvent(_, { eventId }, context) {
-            const user = checkAuth(context);
+        async deleteEvent(_, { eventId, userId }) {
+            const user = await User.findById(userId);
+            if (!user) {
+                throw new Error('User not found');
+            }
 
             try {
                 const event = await Event.findById(eventId);
                 if (event) {
-                    if (event.userId.toString() === user.id) {
+                    if (event.userId.toString() === userId) {
                         await event.delete();
                         return 'Event deleted successfully';
                     } else {

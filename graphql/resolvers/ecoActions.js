@@ -1,16 +1,16 @@
 const EcoAction = require('../../models/EcoAction');
-const Task = require('../../models/Task');
-const checkAuth = require('../../util/check-auth');
+const User = require('../../models/User');
 const { AuthenticationError, UserInputError } = require('apollo-server');
 
 module.exports = {
     Query: {
-        async getEcoActions(_, { userId }, context) {
+        async getEcoActions(_, { userId }) {
             try {
-                const user = checkAuth(context);
-                const ecoActions = await EcoAction.find({ userId })
-                    .sort({ createdAt: -1 })
-                    .populate('taskId');
+                const user = await User.findById(userId);
+                if (!user) {
+                    throw new Error('User not found');
+                }
+                const ecoActions = await EcoAction.find({ userId }).sort({ createdAt: -1 });
                 return ecoActions;
             } catch (err) {
                 throw new Error(err);
@@ -18,8 +18,11 @@ module.exports = {
         }
     },
     Mutation: {
-        async recordEcoAction(_, { taskId, description, impact }, context) {
-            const user = checkAuth(context);
+        async recordEcoAction(_, { taskId, description, impact, userId }) {
+            const user = await User.findById(userId);
+            if (!user) {
+                throw new Error('User not found');
+            }
 
             if (description.trim() === '') {
                 throw new UserInputError('Empty description', {
@@ -29,29 +32,16 @@ module.exports = {
                 });
             }
 
-            try {
-                const task = await Task.findById(taskId);
-                if (!task) {
-                    throw new Error('Task not found');
-                }
+            const newEcoAction = new EcoAction({
+                taskId,
+                description,
+                impact,
+                userId,
+                createdAt: new Date().toISOString()
+            });
 
-                if (task.userId.toString() !== user.id) {
-                    throw new AuthenticationError('Action not allowed');
-                }
-
-                const newEcoAction = new EcoAction({
-                    taskId,
-                    description,
-                    impact,
-                    userId: user.id,
-                    createdAt: new Date().toISOString()
-                });
-
-                const ecoAction = await newEcoAction.save();
-                return ecoAction;
-            } catch (err) {
-                throw new Error(err);
-            }
+            const ecoAction = await newEcoAction.save();
+            return ecoAction;
         }
     }
 }; 

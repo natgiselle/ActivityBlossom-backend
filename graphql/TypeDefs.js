@@ -108,7 +108,7 @@ const TypeDefs = gql`
         getUser(email: String!, password: String!): User
         getUsers: [User]!
         getTasks(userId: ID!): [Task]
-        getTask(taskId: ID!): Task
+        getTask(taskId: ID!, userId: ID!): Task
         getEvents(userId: ID!): [Event]
         getEvent(eventId: ID!): Event
         getSustainabilityGoals(userId: ID!): [SustainabilityGoal]
@@ -119,10 +119,10 @@ const TypeDefs = gql`
     type Mutation {
         register(email: String!, password: String!): User
         login(email: String!, password: String!): User
-        createTask(taskInput: TaskInput): Task
-        updateTask(taskId: ID!, taskInput: TaskInput): Task
-        deleteTask(taskId: ID!): String
-        toggleTaskCompletion(taskId: ID!): Task
+        createTask(taskInput: TaskInput, userId: ID!): Task
+        updateTask(taskId: ID!, taskInput: TaskInput, userId: ID!): Task
+        deleteTask(taskId: ID!, userId: ID!): String
+        toggleTaskCompletion(taskId: ID!, userId: ID!): Task
         createEvent(eventInput: EventInput): Event
         updateEvent(eventId: ID!, eventInput: EventInput): Event
         deleteEvent(eventId: ID!): String

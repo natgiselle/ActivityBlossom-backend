@@ -1,24 +1,30 @@
 const SustainabilityGoal = require('../../models/SustainabilityGoal');
-const checkAuth = require('../../util/check-auth');
+const User = require('../../models/User');
 const { AuthenticationError, UserInputError } = require('apollo-server');
 
 module.exports = {
     Query: {
-        async getSustainabilityGoals(_, { userId }, context) {
+        async getSustainabilityGoals(_, { userId }) {
             try {
-                const user = checkAuth(context);
+                const user = await User.findById(userId);
+                if (!user) {
+                    throw new Error('User not found');
+                }
                 const goals = await SustainabilityGoal.find({ userId }).sort({ createdAt: -1 });
                 return goals;
             } catch (err) {
                 throw new Error(err);
             }
         },
-        async getSustainabilityGoal(_, { goalId }, context) {
+        async getSustainabilityGoal(_, { goalId, userId }) {
             try {
-                const user = checkAuth(context);
+                const user = await User.findById(userId);
+                if (!user) {
+                    throw new Error('User not found');
+                }
                 const goal = await SustainabilityGoal.findById(goalId);
                 if (goal) {
-                    if (goal.userId.toString() === user.id) {
+                    if (goal.userId.toString() === userId) {
                         return goal;
                     } else {
                         throw new AuthenticationError('Action not allowed');
@@ -32,8 +38,11 @@ module.exports = {
         }
     },
     Mutation: {
-        async createSustainabilityGoal(_, { goalInput: { title, description, targetDate } }, context) {
-            const user = checkAuth(context);
+        async createSustainabilityGoal(_, { goalInput: { title, description, targetDate }, userId }) {
+            const user = await User.findById(userId);
+            if (!user) {
+                throw new Error('User not found');
+            }
 
             if (title.trim() === '') {
                 throw new UserInputError('Empty title', {
@@ -48,20 +57,23 @@ module.exports = {
                 description,
                 targetDate,
                 completed: false,
-                userId: user.id,
+                userId,
                 createdAt: new Date().toISOString()
             });
 
             const goal = await newGoal.save();
             return goal;
         },
-        async updateSustainabilityGoal(_, { goalId, goalInput: { title, description, targetDate } }, context) {
-            const user = checkAuth(context);
+        async updateSustainabilityGoal(_, { goalId, goalInput: { title, description, targetDate }, userId }) {
+            const user = await User.findById(userId);
+            if (!user) {
+                throw new Error('User not found');
+            }
 
             try {
                 const goal = await SustainabilityGoal.findById(goalId);
                 if (goal) {
-                    if (goal.userId.toString() === user.id) {
+                    if (goal.userId.toString() === userId) {
                         if (title.trim() === '') {
                             throw new UserInputError('Empty title', {
                                 errors: {
@@ -86,13 +98,16 @@ module.exports = {
                 throw new Error(err);
             }
         },
-        async deleteSustainabilityGoal(_, { goalId }, context) {
-            const user = checkAuth(context);
+        async deleteSustainabilityGoal(_, { goalId, userId }) {
+            const user = await User.findById(userId);
+            if (!user) {
+                throw new Error('User not found');
+            }
 
             try {
                 const goal = await SustainabilityGoal.findById(goalId);
                 if (goal) {
-                    if (goal.userId.toString() === user.id) {
+                    if (goal.userId.toString() === userId) {
                         await goal.delete();
                         return 'Goal deleted successfully';
                     } else {
@@ -105,13 +120,16 @@ module.exports = {
                 throw new Error(err);
             }
         },
-        async toggleGoalCompletion(_, { goalId }, context) {
-            const user = checkAuth(context);
+        async toggleGoalCompletion(_, { goalId, userId }) {
+            const user = await User.findById(userId);
+            if (!user) {
+                throw new Error('User not found');
+            }
 
             try {
                 const goal = await SustainabilityGoal.findById(goalId);
                 if (goal) {
-                    if (goal.userId.toString() === user.id) {
+                    if (goal.userId.toString() === userId) {
                         goal.completed = !goal.completed;
                         await goal.save();
                         return goal;

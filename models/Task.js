@@ -1,7 +1,10 @@
-const { model, Schema } = require('mongoose');
+const mongoose = require('mongoose');
 
-const taskSchema = new Schema({
-    title: String,
+const TaskSchema = new mongoose.Schema({
+    title: {
+        type: String,
+        required: true
+    },
     description: String,
     dueDate: String,
     completed: {
@@ -10,13 +13,17 @@ const taskSchema = new Schema({
     },
     isEcoFriendly: {
         type: Boolean,
-        default: false
+        required: true
     },
     userId: {
-        type: Schema.Types.ObjectId,
-        ref: 'User'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     },
-    createdAt: String
+    createdAt: {
+        type: String,
+        required: true
+    }
 });
 
-module.exports = model('Task', taskSchema); 
+module.exports = mongoose.model('Task', TaskSchema); 
