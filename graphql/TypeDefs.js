@@ -38,10 +38,8 @@ type Query{
 const TypeDefs = gql`
     type User {
         id: ID!
-        username: String!
         email: String!
         password: String!
-        token: String
         createdAt: String!
         avatarFlower: String
     }
@@ -86,13 +84,6 @@ const TypeDefs = gql`
         createdAt: String!
     }
 
-    input RegisterInput {
-        username: String!
-        email: String!
-        password: String!
-        confirmPassword: String!
-    }
-
     input TaskInput {
         title: String!
         description: String
@@ -114,7 +105,7 @@ const TypeDefs = gql`
     }
 
     type Query {
-        getUser(userId: ID!): User
+        getUser(email: String!, password: String!): User
         getUsers: [User]!
         getTasks(userId: ID!): [Task]
         getTask(taskId: ID!): Task
@@ -126,8 +117,8 @@ const TypeDefs = gql`
     }
 
     type Mutation {
-        register(registerInput: RegisterInput): User
-        login(username: String!, password: String!): User
+        register(email: String!, password: String!): User
+        login(email: String!, password: String!): User
         createTask(taskInput: TaskInput): Task
         updateTask(taskId: ID!, taskInput: TaskInput): Task
         deleteTask(taskId: ID!): String
